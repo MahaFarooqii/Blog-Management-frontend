@@ -1,197 +1,157 @@
-import React, { useEffect } from "react";
-import {
-    PieChart,
-    Pie,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAnalyticsByRole } from "../store/reducers/analyticsSlice";
 import { useAuth } from "../context/AuthContext";
 import type { AppDispatch, RootState } from "../store/store";
+import { fetchPosts, fetchUserPosts } from "../store/reducers/postsSlice";
+import { AddPostModal } from "../components/addPostModal";
+import { ViewPostModal } from "../components/viewPostModal";
+import { UpdatePostModal } from "../components/updatePostModal";
+import { DeletePostModal } from "../components/deletePostModal";
+import { FaEye, FaPencilAlt, FaTrash } from "react-icons/fa";
 
 const Dashboard: React.FC = () => {
     const { user } = useAuth();
     const dispatch = useDispatch<AppDispatch>();
-    const { overview, isLoading, error } = useSelector(
-        (state: RootState) => state.analytics
-    );
+    const { posts, isLoading, error } = useSelector((state: RootState) => state.posts);
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedPost, setSelectedPost] = useState([]);
 
     useEffect(() => {
-        if (user?.role) {
-            dispatch(fetchAnalyticsByRole({ role: user.role }));
+        if (user) {
+            dispatch(fetchUserPosts(user?.id));
+        } else {
+            dispatch(fetchPosts());
         }
-    }, [user, dispatch]);
+    }, [user]);
 
-    if (isLoading) return <div>Loading dashboard...</div>;
-    if (error) return <div className="text-red-500">Error: {error}</div>;
-    if (!overview) return <div>No analytics found</div>;
+    const handleViewPost = (post: any) => {
+        setSelectedPost(post);
+        setIsViewModalOpen(true);
+    };
+    const handleUpdatePost = (post: any) => {
+        setSelectedPost(post);
+        setIsUpdateModalOpen(true);
+    };
+    const handleDeletePost = (post: any) => {
+        setSelectedPost(post);
+        setIsDeleteModalOpen(true);
+    };
 
-    const projectStatus = overview.projectStatus?.map((p: any) => ({
-        name: p._id,
-        value: p.count,
-    }));
-    const taskDist = overview.taskDist?.map((t: any) => ({
-        name: t._id,
-        value: t.count,
-    }));
-    const ticketsResolved = overview.ticketsResolved;
-    const modPerf = overview.moderatorPerf;
-    const role = user?.role;
 
-    const renderSection = (
-        title: string,
-        description: string,
-        chart: React.ReactNode
-    ) => (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-xl font-semibold mb-1 text-gray-800">{title}</h3>
-            <p className="text-sm text-gray-500 mb-4">{description}</p>
-            <div style={{ height: 250 }}>{chart}</div>
-        </div>
-    );
-
+    if (error) {
+        return <div className="text-red-500 p-6 text-center font-medium">Error: {error}</div>;
+    }
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Analytics Dashboard</h1>
-                <p className="text-gray-600 mt-1">
-                    Welcome, <span className="font-medium">{user?.name}</span> —{" "}
-                    <span className="capitalize">{role}</span>
-                </p>
-            </div>
+        <div className="px-8 md:px-20 py-10 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen w-screen">
+            {isLoading ? (
+                <div className="flex justify-center items-center w-screen min-h-screen bg-gray-50">
+                    <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+                        <span className="mt-4 text-gray-500 text-lg">Loading blog posts...</span>
+                    </div>
+                </div>
 
-            {role === "admin" && (
+            ) : (
                 <>
-                    <p className="text-gray-500 mb-6">
-                        Manage users, view system-wide analytics, and oversee all projects.
-                    </p>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 space-y-4 md:space-y-0">
+                        <div>
+                            <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+                                Blog Dashboard
+                            </h1>
+                            <p className="text-gray-600 mt-1 text-sm">
+                                Welcome back, <span className="font-semibold text-gray-800">{user?.name}</span> 👋
+                            </p>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                        {renderSection(
-                            "Project Status (Active vs Completed)",
-                            "Shows how many projects are currently active and how many are completed across the system.",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={projectStatus}
-                                        dataKey="value"
-                                        nameKey="name"
-                                        outerRadius={80}
-                                        label
-                                    />
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-
-                        {renderSection(
-                            "Task Distribution",
-                            "Displays how tasks are distributed by status (open, in-progress, resolved).",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={taskDist}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="value" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-
-                        {renderSection(
-                            "Tickets Resolved per User",
-                            "Shows how many tickets each user has successfully resolved.",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={ticketsResolved}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="resolvedCount" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-
-                        {renderSection(
-                            "Moderator Performance (Team Progress)",
-                            "Displays how many tasks were resolved under each moderator’s projects — useful to compare team performance.",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={modPerf}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="resolved" name="Resolved Tasks" />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        {user && (
+                            <button
+                                onClick={() => setIsAddModalOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg shadow-md transition transform hover:scale-105 focus:outline-none"
+                            >
+                                + Add Post
+                            </button>
                         )}
                     </div>
-                </>
-            )}
 
-            {role === "moderator" && (
-                <>
-                    <p className="text-gray-500 mb-6">
-                        Manage your projects, assign tasks, and track your team’s progress.
+                    <p className="text-gray-500 mb-8 text-sm">
+                        Browse, view, edit, or delete your latest posts below.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {renderSection(
-                            "Project Status",
-                            "Shows the current state of your projects (active vs completed).",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={projectStatus}
-                                        dataKey="value"
-                                        nameKey="name"
-                                        outerRadius={80}
-                                        label
-                                    />
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-                        {renderSection(
-                            "Team Task Distribution",
-                            "Displays how your team’s tasks are divided between open, in-progress, and resolved statuses.",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={taskDist}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="value" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </div>
-                </>
-            )}
 
-            {role === "user" && (
-                <>
-                    <p className="text-gray-500 mb-6 w-full">
-                        Track your progress and monitor your resolved tickets.
-                    </p>
-                    <div className="grid grid-cols-1 gap-8">
-                        {renderSection(
-                            "Your Ticket Resolution Progress",
-                            "Shows how many tickets you’ve resolved to date.",
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={ticketsResolved?.filter(
-                                        (t: any) => t.name === user?.name
-                                    )}
+                    {(!posts || posts?.length === 0) ? (
+                        <div className="flex items-center justify-center w-screen h-screen bg-white rounded-xl shadow-inner text-gray-500 text-lg">
+                            No blog posts found.
+                        </div>
+                    ) : (
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                            {posts?.map?.((post) => (
+                                <div
+                                    key={post?._id}
+                                    className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group overflow-hidden"
                                 >
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="resolvedCount" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </div>
+                                    <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-600 transition">
+                                            {post?.title}
+                                        </h3>
+
+                                        <p className="text-gray-600 text-sm mb-5 line-clamp-3 leading-relaxed">
+                                            {post?.content}
+                                        </p>
+
+                                        <div className="text-gray-400 text-xs flex justify-between items-center">
+                                            <span>
+                                                By{" "}
+                                                <span className="font-medium text-gray-700">
+                                                    {post.authorId?.name || "Unknown"}
+                                                </span>
+                                            </span>
+                                            <span>{new Date(post?.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="absolute top-3 right-3 flex space-x-3 bg-white/70 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition">
+                                        <button
+                                            onClick={() => handleViewPost(post)}
+                                            className="text-white hover:text-blue-600 transition"
+                                            title="View Post"
+                                        >
+                                            <FaEye size={16} />
+                                        </button>
+
+                                        {post?.authorId?._id === user?.id && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleUpdatePost(post)}
+                                                    className="text-white hover:text-green-600 transition"
+                                                    title="Edit Post"
+                                                >
+                                                    <FaPencilAlt size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeletePost(post)}
+                                                    className="text-white hover:text-red-600 transition"
+                                                    title="Delete Post"
+                                                >
+                                                    <FaTrash size={14} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <AddPostModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+                    <ViewPostModal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} post={selectedPost} />
+                    <UpdatePostModal isOpen={isUpdateModalOpen} onClose={() => setIsUpdateModalOpen(false)} post={selectedPost} />
+                    <DeletePostModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} post={selectedPost} />
                 </>
             )}
         </div>
