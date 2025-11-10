@@ -41,7 +41,6 @@ const Dashboard: React.FC = () => {
         setIsDeleteModalOpen(true);
     };
 
-
     if (error) {
         return <div className="text-red-500 p-6 text-center font-medium">Error: {error}</div>;
     }
@@ -72,7 +71,7 @@ const Dashboard: React.FC = () => {
                                 onClick={() => setIsAddModalOpen(true)}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg shadow-md transition transform hover:scale-105 focus:outline-none"
                             >
-                                + Add Post
+                                + Add Blog
                             </button>
                         )}
                     </div>
@@ -100,9 +99,11 @@ const Dashboard: React.FC = () => {
                                             {post?.title}
                                         </h3>
 
-                                        <p className="text-gray-600 text-sm mb-5 line-clamp-3 leading-relaxed">
-                                            {post?.content}
-                                        </p>
+                                        <div
+                                            className="text-gray-600 text-sm mb-5 line-clamp-3 leading-relaxed"
+                                            dangerouslySetInnerHTML={{ __html: post?.content || "" }}
+                                        />
+
 
                                         <div className="text-gray-400 text-xs flex justify-between items-center">
                                             <span>

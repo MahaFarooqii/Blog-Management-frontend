@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../store/store";
 import { updatePost } from "../store/reducers/postsSlice";
 import { FaEdit } from "react-icons/fa";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 interface UpdatePostModalProps {
     isOpen: boolean;
@@ -70,12 +72,13 @@ export const UpdatePostModal = ({ isOpen, onClose, post }: UpdatePostModalProps)
 
                     <div>
                         <label className="block text-gray-700 font-medium mb-1">Content</label>
-                        <textarea
-                            className="border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-100 outline-none p-3 w-full rounded-lg bg-white text-gray-800 min-h-[160px] resize-none placeholder-gray-400 transition"
+                        <ReactQuill
+                            key={post?._id}
+                            theme="snow"
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={setContent}
                             placeholder="Update your blog post content..."
-                            required
+                            className="bg-white text-gray-800"
                         />
                     </div>
 

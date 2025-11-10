@@ -8,7 +8,6 @@ interface ViewPostModalProps {
 
 export const ViewPostModal = ({ isOpen, onClose, post }: ViewPostModalProps) => {
     if (!isOpen) return null;
-
     return (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="relative bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl border border-gray-100 transform transition-all duration-300 scale-100 opacity-100">
@@ -33,9 +32,11 @@ export const ViewPostModal = ({ isOpen, onClose, post }: ViewPostModalProps) => 
 
                     <div>
                         <h3 className="text-lg font-semibold text-gray-800 mb-1">Content</h3>
-                        <div className="text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-line leading-relaxed">
-                            {post?.content}
-                        </div>
+                        <div
+                            className="text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100 leading-relaxed [&_ol]:list-decimal [&_ul]:list-disc [&_li]:ml-5 [&_li]:mb-1"
+                            dangerouslySetInnerHTML={{ __html: post?.content || "" }}
+                        />
+
                     </div>
 
                     <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
