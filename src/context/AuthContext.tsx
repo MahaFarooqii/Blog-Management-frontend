@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import API from "../api/axios";
 
-type User = { id: string; name: string; role: string } | null;
+type User = { id: string; name: string; } | null;
 
 interface AuthContextType {
     user: User;
     login: (email: string, password: string) => Promise<User>;
-    register: (name: string, email: string, password: string, role: string) => Promise<User>;
+    register: (name: string, email: string, password: string) => Promise<User>;
     logout: () => void;
 }
 
@@ -33,8 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return data.user;
     };
 
-    const register = async (name: string, email: string, password: string, role: string) => {
-        const { data } = await API.post("/auth/register", { name, email, password, role });
+    const register = async (name: string, email: string, password: string) => {
+        const { data } = await API.post("/auth/register", { name, email, password });
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setUser(data.user);
