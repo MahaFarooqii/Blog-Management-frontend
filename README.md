@@ -15,19 +15,32 @@ Users can register, log in, and create, edit, or delete their own blog posts. Pu
 
 ⚙️ Setup Instructions
 npm install
+
 npm run dev
 
 🔐 Authentication Flow
+
 User registers with name, email, password (hashed using bcrypt).
+
 User logs in and receives a JWT token.
+
 Token is stored in local storage and attached to authenticated requests.
+
 Middleware verifies token for protected routes.
 
+
 🧭 Frontend Features
+
 Register/Login/Logout flow
+
 Create, edit, delete blog posts
+
 Rich text editor (React-Quill) for content
+
 Public blog listing and detail pages
+
 Redux for global state 
+
 Loading & error states
+
 Protected routes for logged-in users only
