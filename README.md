@@ -1,73 +1,33 @@
-# React + TypeScript + Vite
+📝 MERN Blog Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack MERN blog platform with JWT authentication, rich text editor, and Redux state management.
+Users can register, log in, and create, edit, or delete their own blog posts. Public visitors can view all blog posts without logging in.
 
-Currently, two official plugins are available:
+🚀 Tech Stack
+| Layer                     | Technology                                                   |
+| ------------------------- | ------------------------------------------------------------ |
+| **Frontend**              | React, Redux Toolkit, React Router, React-Quill, TailwindCSS |
+| **Backend**               | Node.js, Express.js, MongoDB, Mongoose                       |
+| **Authentication**        | JWT (JSON Web Token), bcrypt.js                              |
+| **State Management**      | Redux Toolkit                                                |
+| **Styling**               | Tailwind CSS                                                 |
+| **Deployment (Optional)** | Render / Netlify / Vercel                                    |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+⚙️ Setup Instructions
+npm install
+npm run dev
 
-## React Compiler
+🔐 Authentication Flow
+User registers with name, email, password (hashed using bcrypt).
+User logs in and receives a JWT token.
+Token is stored in local storage and attached to authenticated requests.
+Middleware verifies token for protected routes.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+🧭 Frontend Features
+Register/Login/Logout flow
+Create, edit, delete blog posts
+Rich text editor (React-Quill) for content
+Public blog listing and detail pages
+Redux for global state 
+Loading & error states
+Protected routes for logged-in users only
