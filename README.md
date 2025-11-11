@@ -11,9 +11,9 @@ Users can register, log in, and create, edit, or delete their own blog posts. Pu
 | **Authentication**        | JWT (JSON Web Token), bcrypt.js                              |
 | **State Management**      | Redux Toolkit                                                |
 | **Styling**               | Tailwind CSS                                                 |
-| **Deployment (Optional)** | Render / Netlify / Vercel                                    |
 
 ⚙️ Setup Instructions
+
 npm install
 
 npm run dev
